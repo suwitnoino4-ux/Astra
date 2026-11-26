@@ -1,0 +1,42 @@
+name: Build ASTRA Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout kode proyek
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build Debug APK
+        run: gradle assembleDebug --no-daemon
+
+      - name: Siapkan file APK final
+        run: |
+          mkdir -p release-apk
+          cp app/build/outputs/apk/debug/app-debug.apk release-apk/ASTRA-E-Modul-STEM-v5.apk
+
+      - name: Upload APK ke Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ASTRA-E-Modul-STEM-v5-APK
+          path: release-apk/ASTRA-E-Modul-STEM-v5.apk
+          retention-days: 90
